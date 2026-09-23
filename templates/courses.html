@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>課程管理</h1>
+<form method="post" class="panel">
+  <h3>新增課程</h3>
+  <input name="id" placeholder="課程編號 *" required>
+  <input name="name" placeholder="課程名稱 *" required>
+  <select name="teacher_id">
+    <option value="">-- 授課教師 (可不選) --</option>
+    {% for t in teacher_list %}
+    <option value="{{ t.id }}">{{ t.name }} ({{ t.id }})</option>
+    {% endfor %}
+  </select>
+  <input name="credit" type="number" placeholder="學分" value="0" min="0">
+  <button>新增</button>
+</form>
+<table>
+<tr><th>編號</th><th>課程</th><th>教師</th><th>學分</th><th></th></tr>
+{% for r in rows %}
+<tr><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.tname or "-" }}</td><td>{{ r.credit }}</td>
+<td><a class="del" href="{{ url_for('courses_delete', cid=r.id) }}" onclick="return confirm('確定刪除?成績/出缺勤會連帶刪除')">刪除</a></td></tr>
+{% else %}
+<tr><td colspan="5">尚無資料</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

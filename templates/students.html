@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>學生管理</h1>
+<form method="get" class="inline">
+  <input name="q" placeholder="搜尋學號/姓名/班級" value="{{ q }}">
+  <button>搜尋</button>
+  {% if q %}<a href="{{ url_for('students') }}">清除</a>{% endif %}
+</form>
+<form method="post" class="panel">
+  <h3>新增學生</h3>
+  <input name="id" placeholder="學號 *" required>
+  <input name="name" placeholder="姓名 *" required>
+  <input name="gender" placeholder="性別">
+  <input name="class_name" placeholder="班級">
+  <input name="phone" placeholder="電話">
+  <button>新增</button>
+</form>
+<table>
+<tr><th>學號</th><th>姓名</th><th>性別</th><th>班級</th><th>電話</th><th></th></tr>
+{% for r in rows %}
+<tr><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.gender }}</td>
+<td>{{ r.class_name }}</td><td>{{ r.phone }}</td>
+<td><a class="del" href="{{ url_for('students_delete', sid=r.id) }}" onclick="return confirm('確定刪除?')">刪除</a></td></tr>
+{% else %}
+<tr><td colspan="6">尚無資料</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

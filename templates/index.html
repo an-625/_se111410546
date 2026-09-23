@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>儀表板</h1>
+<div class="cards">
+  <div class="card"><div class="n">{{ counts.students }}</div><div>學生</div></div>
+  <div class="card"><div class="n">{{ counts.teachers }}</div><div>教師</div></div>
+  <div class="card"><div class="n">{{ counts.courses }}</div><div>課程</div></div>
+  <div class="card"><div class="n">{{ counts.grades }}</div><div>成績筆數</div></div>
+  <div class="card"><div class="n">{{ counts.attendance }}</div><div>出缺勤筆數</div></div>
+</div>
+<h2>最近成績</h2>
+<table>
+<tr><th>學生</th><th>課程</th><th>分數</th></tr>
+{% for r in recent_grades %}
+<tr><td>{{ r.sname }}</td><td>{{ r.cname }}</td><td>{{ r.score }}</td></tr>
+{% else %}
+<tr><td colspan="3">尚無資料</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

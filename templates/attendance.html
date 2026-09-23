@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>出缺勤管理</h1>
+<p>統計:
+{% for s in stat %}{{ s.status }}×{{ s.n }}　{% else %}尚無資料{% endfor %}
+</p>
+<form method="get" class="inline">
+  <input name="q" placeholder="搜尋學生/課程/日期" value="{{ q }}">
+  <button>搜尋</button>
+  {% if q %}<a href="{{ url_for('attendance') }}">清除</a>{% endif %}
+</form>
+<form method="post" class="panel">
+  <h3>點名 (同一天+學生+課程重複會覆蓋)</h3>
+  <input name="date" type="date" required>
+  <select name="student_id" required>
+    <option value="">-- 學生 --</option>
+    {% for s in students_list %}
+    <option value="{{ s.id }}">{{ s.name }} ({{ s.id }})</option>
+    {% endfor %}
+  </select>
+  <select name="course_id" required>
+    <option value="">-- 課程 --</option>
+    {% for c in courses_list %}
+    <option value="{{ c.id }}">{{ c.name }} ({{ c.id }})</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    {% for st in status_list %}
+    <option value="{{ st }}">{{ st }}</option>
+    {% endfor %}
+  </select>
+  <button>儲存</button>
+</form>
+<table>
+<tr><th>日期</th><th>學生</th><th>課程</th><th>狀態</th><th></th></tr>
+{% for r in rows %}
+<tr><td>{{ r.date }}</td><td>{{ r.sname }} ({{ r.sid }})</td><td>{{ r.cname }}</td><td>{{ r.status }}</td>
+<td><a class="del" href="{{ url_for('attendance_delete', aid=r.id) }}" onclick="return confirm('確定刪除?')">刪除</a></td></tr>
+{% else %}
+<tr><td colspan="5">尚無資料</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,23 @@
+* { box-sizing: border-box; }
+body { font-family: "Microsoft JhengHei", sans-serif; margin: 0; background: #f4f6fa; color: #222; }
+nav { background: #1f6feb; color: #fff; padding: 12px 16px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+nav a { color: #fff; text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+.wrap { max-width: 900px; margin: 20px auto; padding: 0 16px 40px; }
+.cards { display: flex; gap: 12px; flex-wrap: wrap; }
+.card { background: #fff; border-radius: 10px; padding: 16px 24px; box-shadow: 0 1px 4px rgba(0,0,0,.1); text-align: center; }
+.card .n { font-size: 28px; font-weight: bold; color: #1f6feb; }
+table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 12px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background: #eaf1ff; }
+.panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-top: 12px; }
+.panel input, .panel select { margin: 4px; padding: 6px; }
+button { padding: 6px 14px; background: #1f6feb; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+button:hover { background: #1558c0; }
+.inline { margin: 8px 0; }
+.inline input { padding: 6px; }
+.flash { padding: 8px 12px; border-radius: 6px; margin: 8px 0; }
+.flash.ok { background: #d4edda; color: #155724; }
+.flash.error { background: #f8d7da; color: #721c24; }
+.del { color: #c00; }
+h1 { margin-bottom: 4px; }

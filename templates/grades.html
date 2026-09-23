@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>成績管理</h1>
+<p>平均: {{ "%.1f"|format(avg.a) if avg.a is not none else "-" }}　
+最高: {{ avg.mx if avg.mx is not none else "-" }}　
+最低: {{ avg.mn if avg.mn is not none else "-" }}</p>
+<form method="get" class="inline">
+  <input name="q" placeholder="搜尋學生/課程/學號" value="{{ q }}">
+  <button>搜尋</button>
+  {% if q %}<a href="{{ url_for('grades') }}">清除</a>{% endif %}
+</form>
+<form method="post" class="panel">
+  <h3>登錄成績 (同一學生+課程重複登錄會覆蓋)</h3>
+  <select name="student_id" required>
+    <option value="">-- 學生 --</option>
+    {% for s in students_list %}
+    <option value="{{ s.id }}">{{ s.name }} ({{ s.id }})</option>
+    {% endfor %}
+  </select>
+  <select name="course_id" required>
+    <option value="">-- 課程 --</option>
+    {% for c in courses_list %}
+    <option value="{{ c.id }}">{{ c.name }} ({{ c.id }})</option>
+    {% endfor %}
+  </select>
+  <input name="score" type="number" step="0.5" min="0" max="100" placeholder="分數 0~100" required>
+  <button>儲存</button>
+</form>
+<table>
+<tr><th>學生</th><th>課程</th><th>分數</th><th></th></tr>
+{% for r in rows %}
+<tr><td>{{ r.sname }} ({{ r.sid }})</td><td>{{ r.cname }} ({{ r.cid }})</td><td>{{ r.score }}</td>
+<td><a class="del" href="{{ url_for('grades_delete', gid=r.id) }}" onclick="return confirm('確定刪除?')">刪除</a></td></tr>
+{% else %}
+<tr><td colspan="4">尚無資料</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>校務系統</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav>
+  <b>🏫 校務系統</b>
+  <a href="{{ url_for('index') }}">首頁</a>
+  <a href="{{ url_for('students') }}">學生管理</a>
+  <a href="{{ url_for('teachers') }}">教師管理</a>
+  <a href="{{ url_for('courses') }}">課程管理</a>
+  <a href="{{ url_for('grades') }}">成績管理</a>
+  <a href="{{ url_for('attendance') }}">出缺勤</a>
+</nav>
+<div class="wrap">
+{% with msgs = get_flashed_messages(with_categories=true) %}
+{% if msgs %}
+  {% for cat, m in msgs %}
+  <div class="flash {{ cat }}">{{ m }}</div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+{% block body %}{% endblock %}
+</div>
+</body>
+</html>
