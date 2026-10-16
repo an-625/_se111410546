@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Docker 微服務系統展示</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --green:#22c55e; --red:#ef4444; --yellow:#eab308; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Microsoft JhengHei",system-ui,sans-serif; background:linear-gradient(135deg,#0f172a,#1e1b4b); color:#e2e8f0; min-height:100vh; }
+  header { text-align:center; padding:36px 16px 12px; }
+  header h1 { margin:0; font-size:2rem; }
+  header h1 span { color:var(--accent); }
+  header p { color:#94a3b8; }
+  .badge { display:inline-block; background:#0ea5e9; color:#fff; border-radius:999px; padding:4px 14px; font-size:.8rem; margin:4px; }
+  main { max-width:1100px; margin:0 auto; padding:16px; }
+  .arch { background:var(--card); border:1px solid #334155; border-radius:12px; padding:18px; margin:16px 0; overflow-x:auto; }
+  .arch pre { margin:0; font-size:.85rem; line-height:1.6; color:#a5f3fc; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:16px 0; }
+  .card { background:var(--card); border:1px solid #334155; border-radius:12px; padding:16px; }
+  .card h3 { margin:0 0 6px; display:flex; align-items:center; gap:8px; }
+  .dot { width:12px; height:12px; border-radius:50%; background:var(--yellow); display:inline-block; }
+  .dot.ok { background:var(--green); } .dot.fail { background:var(--red); }
+  .card small { color:#94a3b8; }
+  .card code { background:#0f172a; padding:2px 6px; border-radius:6px; font-size:.8rem; }
+  button { background:#0ea5e9; border:none; color:#fff; border-radius:8px; padding:8px 12px; cursor:pointer; margin:6px 4px 0 0; }
+  button:hover { background:#0284c7; }
+  button.secondary { background:#334155; }
+  pre.json { background:#0f172a; border-radius:8px; padding:10px; max-height:220px; overflow:auto; font-size:.75rem; color:#bbf7d0; white-space:pre-wrap; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th,td { border:1px solid #334155; padding:8px; text-align:left; }
+  th { background:#0f172a; }
+  footer { text-align:center; color:#64748b; padding:24px; font-size:.8rem; }
+  .cmd { background:#020617; border-radius:8px; padding:12px; font-family:monospace; font-size:.8rem; color:#a5f3fc; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🐳 Docker <span>微服務</span>系統展示</h1>
+  <p>nginx 反向代理 ＋ Node.js / Rust / Python ＋ PostgreSQL</p>
+  <div>
+    <span class="badge">nginx :8080</span>
+    <span class="badge">node :3000</span>
+    <span class="badge">rust :8000</span>
+    <span class="badge">python :5000</span>
+    <span class="badge">postgres :5432</span>
+  </div>
+</header>
+
+<main>
+  <div class="arch">
+    <h3>📦 系統架構</h3>
+    <pre>Browser ──► nginx:80 (web server + reverse proxy, 本頁)
+              ├─ /               → 靜態前端 (html/)
+              ├─ /health        → nginx 自檢
+              ├─ /api/node/*   → api-node:3000   (Node.js 20 + Express)
+              ├─ /api/rust/*   → api-rust:8000   (Rust + Axum)
+              └─ /api/python/* → api-python:5000 (Python 3.12 + Flask)
+                                  └─► postgres:5432 (PostgreSQL 16, db: microdb)</pre>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3><span class="dot" id="dot-nginx"></span> nginx</h3>
+      <small>web server + reverse proxy</small><br/>
+      <code>GET /health</code><br/>
+      <button onclick="check('nginx','/health')">檢查</button>
+      <pre class="json" id="out-nginx">尚未檢查</pre>
+    </div>
+    <div class="card">
+      <h3><span class="dot" id="dot-node"></span> Node.js</h3>
+      <small>Express・容器 <code>micro-node</code></small><br/>
+      <code>/api/node/health・/info・/visits</code><br/>
+      <button onclick="check('node','/api/node/health')">health</button>
+      <button class="secondary" onclick="check('node','/api/node/info')">info (含DB)</button>
+      <button class="secondary" onclick="visit('node')">+visit</button>
+      <pre class="json" id="out-node">尚未檢查</pre>
+    </div>
+    <div class="card">
+      <h3><span class="dot" id="dot-rust"></span> Rust</h3>
+      <small>Axum・容器 <code>micro-rust</code></small><br/>
+      <code>/api/rust/health・/info・/visits</code><br/>
+      <button onclick="check('rust','/api/rust/health')">health</button>
+      <button class="secondary" onclick="check('rust','/api/rust/info')">info (含DB)</button>
+      <button class="secondary" onclick="visit('rust')">+visit</button>
+      <pre class="json" id="out-rust">尚未檢查</pre>
+    </div>
+    <div class="card">
+      <h3><span class="dot" id="dot-python"></span> Python</h3>
+      <small>Flask・容器 <code>micro-python</code></small><br/>
+      <code>/api/python/health・/info・/visits</code><br/>
+      <button onclick="check('python','/api/python/health')">health</button>
+      <button class="secondary" onclick="check('python','/api/python/info')">info (含DB)</button>
+      <button class="secondary" onclick="visit('python')">+visit</button>
+      <pre class="json" id="out-python">尚未檢查</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🗄️ PostgreSQL 資料庫展示</h3>
+    <p><small>透過任一後端查詢 <code>SELECT version(), COUNT(*) FROM visits</code>。按下方按鈕從三種語言寫入同一張表，證明共用資料庫。</small></p>
+    <button onclick="check('node','/api/node/visits');check('rust','/api/rust/visits');check('python','/api/python/visits')">查詢三服務 visits</button>
+    <button class="secondary" onclick="checkAll()">一鍵全檢查</button>
+    <button class="secondary" onclick="toggleAuto()">自動刷新: <span id="auto-state">開</span></button>
+  </div>
+
+  <div class="card">
+    <h3>🧱 技術棧</h3>
+    <table>
+      <tr><th>角色</th><th>技術</th><th>容器 / 鏡像</th></tr>
+      <tr><td>Web Server / Reverse Proxy</td><td>nginx 1.27-alpine</td><td>micro-nginx</td></tr>
+      <tr><td>後端 ①</td><td>Node.js 20 + Express + pg</td><td>micro-node</td></tr>
+      <tr><td>後端 ②</td><td>Rust + Axum + tokio-postgres</td><td>micro-rust</td></tr>
+      <tr><td>後端 ③</td><td>Python 3.12 + Flask + psycopg2</td><td>micro-python</td></tr>
+      <tr><td>資料庫</td><td>PostgreSQL 16-alpine</td><td>micro-postgres</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>⌨️ 常用指令（繳交後評分者操作）</h3>
+    <div class="cmd">docker compose up --build -d<br/>docker compose ps<br/>docker compose logs -f nginx<br/>curl http://localhost:8080/health<br/>curl http://localhost:8080/api/node/info<br/>docker compose down -v</div>
+  </div>
+</main>
+
+<footer>docker-micro-system・Dockerfile + docker-compose.yml・5 個容器・1 個共用 network</footer>
+
+<script>
+async function check(name, url) {
+  const out = document.getElementById('out-' + name);
+  const dot = document.getElementById('dot-' + name);
+  out.textContent = '載入中 ' + url + ' ...';
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    out.textContent = JSON.stringify(j, null, 2);
+    dot.className = 'dot ' + (r.ok ? 'ok' : 'fail');
+  } catch (e) {
+    out.textContent = '❌ 連線失敗: ' + e.message;
+    dot.className = 'dot fail';
+  }
+}
+async function visit(service) {
+  const map = { node:'/api/node/visits', rust:'/api/rust/visits', python:'/api/python/visits' };
+  try {
+    const r = await fetch(map[service], { method:'POST' });
+    const j = await r.json();
+    document.getElementById('out-'+service).textContent = JSON.stringify(j, null, 2);
+    document.getElementById('dot-'+service).className = 'dot ok';
+  } catch(e) { document.getElementById('out-'+service).textContent = '❌ '+e.message; }
+}
+function checkAll() {
+  check('nginx','/health');
+  check('node','/api/node/info');
+  check('rust','/api/rust/info');
+  check('python','/api/python/info');
+}
+let auto = setInterval(checkAll, 10000);
+function toggleAuto() {
+  const s = document.getElementById('auto-state');
+  if (auto) { clearInterval(auto); auto = null; s.textContent = '關'; }
+  else { auto = setInterval(checkAll, 10000); s.textContent = '開'; }
+}
+checkAll();
+</script>
+</body>
+</html>
